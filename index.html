@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#090811">
+    <meta name="description" content="News – eine schlanke RSS-Leseapp mit Favoriten und Feed-Suche.">
+    <title>News · RSS Reader</title>
+    <link rel="stylesheet" href="./css/styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="hero" aria-label="News Navigation">
+        <img class="hero-art" src="./assets/newsstand.webp" alt="" aria-hidden="true" fetchpriority="high">
+        <button class="hero-title" id="home-button" type="button" aria-label="News – zu den Favoriten">NEWS</button>
+        <div class="hero-section-intro">
+          <h1 class="hero-section-title" id="hero-section-title" aria-live="polite">Favoriten</h1>
+          <p class="hero-section-subtitle" id="hero-section-subtitle">Deine Quellen</p>
+        </div>
+        <div class="hero-paper-count" id="hero-paper-count" aria-label="0 Feeds">
+          <strong class="hero-paper-number" id="hero-paper-number">0</strong>
+          <span class="hero-paper-unit" id="hero-paper-unit">Feeds</span>
+        </div>
+        <div class="hero-showcase-details" id="hero-showcase-details" hidden>
+          <p class="hero-showcase-description" id="hero-showcase-description"></p>
+          <p class="hero-showcase-updated" id="hero-showcase-updated"></p>
+        </div>
+        <button class="hero-hotspot hero-hotspot--favorites" id="nav-favorites" type="button" aria-controls="view" aria-pressed="true">Favoriten</button>
+        <button class="hero-hotspot hero-hotspot--discover" id="nav-discover" type="button" aria-controls="view" aria-pressed="false">Erkunden</button>
+      </header>
+
+      <main id="main" class="content" tabindex="-1">
+        <div id="view" aria-label="News Inhalte">
+          <div class="loading-shell" role="status">News wird geladen …</div>
+        </div>
+      </main>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+    <script type="module" src="./js/app.js"></script>
+  </body>
+</html>
