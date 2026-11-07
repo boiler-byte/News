@@ -1,8 +1,9 @@
 import { CATALOG, INITIAL_FAVORITES } from './catalog.js';
-import { initializeFavorites, addFavorite, deleteFavorite, readCachedFeed, cacheFeed } from './storage.js';
+import { initializeFavorites, addFavorite, updateFavorite, deleteFavorite, readCachedFeed, cacheFeed } from './storage.js';
 import { fetchArticles, looksLikeFeedUrl, normalizeUrl } from './feed-reader.js';
 import { discoverFeeds } from './feedsearch.js';
 import { feedFormat } from './feed-format.js';
+import { findSiteFavicon } from './favicon.js';
 import { renderFavorites, renderDiscover, renderFeed, formatDate } from './ui.js';
 
 const view = document.getElementById('view');
@@ -29,7 +30,7 @@ let toastTimeout;
 
 function isFavorite(url) { return state.favorites.some(feed => feed.url === url); }
 function findFeed(url) {
-  return state.catalog.find(feed => feed.url === url) || state.favorites.find(feed => feed.url === url) ||
+  return state.favorites.find(feed => feed.url === url) || state.catalog.find(feed => feed.url === url) ||
     (state.selectedFeed?.url === url ? state.selectedFeed : null);
 }
 
@@ -96,6 +97,30 @@ function navigate(which, { scroll = true } = {}) {
   if (scroll) scrollToContent();
 }
 
+async function saveDiscoveredFavicon(url) {
+  const original = state.favorites.find(feed => feed.url === url);
+  if (!original || (!original.discovered && !state.searchResults.includes(url)) ||
+      original.favicon || !state.persistent) return;
+  const favicon = await findSiteFavicon(original.website, url);
+  if (!favicon || !isFavorite(url)) return;
+
+  const saved = state.favorites.find(feed => feed.url === url);
+  if (!saved) return;
+  const updated = { ...saved, favicon };
+  try {
+    await updateFavorite(updated);
+    // Removal might have happened during the IndexedDB write.
+    if (!isFavorite(url)) {
+      await deleteFavorite(url);
+      return;
+    }
+    state.favorites = state.favorites.map(feed => feed.url === url ? { ...feed, favicon } : feed);
+    state.catalog = state.catalog.map(feed => feed.url === url ? { ...feed, favicon } : feed);
+    if (state.selectedFeed?.url === url) state.selectedFeed = { ...state.selectedFeed, favicon };
+    render();
+  } catch { /* An unavailable favicon must not prevent adding the feed. */ }
+}
+
 async function toggleFavorite(url) {
   const feed = findFeed(url);
   if (!feed) return;
@@ -110,6 +135,9 @@ async function toggleFavorite(url) {
     if (state.persistent) {
       if (wasFavorite) await deleteFavorite(url);
       else await addFavorite(feed);
+    }
+    if (!wasFavorite && (feed.discovered || state.searchResults.includes(url))) {
+      void saveDiscoveredFavicon(url).catch(() => {});
     }
     notify(wasFavorite ? `${feed.name} entfernt` : `${feed.name} gespeichert`);
   } catch {
@@ -262,3 +290,12 @@ async function initialize() {
   render();
 }
 initialize();
+
+// Service workers require a secure context (HTTPS or localhost).
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js').catch(() => {
+      // The reader can still be used online when offline installation fails.
+    });
+  });
+}

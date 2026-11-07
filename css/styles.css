@@ -145,10 +145,12 @@ button:disabled { cursor: wait; opacity: .64; }
   width: 50px; height: 50px; margin-bottom: 20px;
   border-radius: 14px; background: var(--accent-bg); color: var(--accent);
 }
+.feed-card__favicon { width: 30px; height: 30px; display: block; object-fit: contain; border-radius: 5px; }
 .feed-card__body { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }
 .feed-card__label-row { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 9px; margin-bottom: 7px; }
 .feed-card__category { color: var(--accent); text-transform: uppercase; font-size: 10px; letter-spacing: .12em; font-weight: 800; }
 .feed-card__format { padding: 3px 7px; border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); border-radius: 6px; font-size: 10px; font-weight: 760; letter-spacing: .02em; color: var(--accent); background: var(--accent-bg); }
+.feed-card__format.is-muted { color: #93909f; border-color: rgba(162, 157, 175, .24); background: rgba(149, 146, 159, .10); }
 .feed-card__url { display: block; max-width: 100%; margin-top: 11px; color: var(--soft); font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .feed-card__name { max-width: 100%; margin: 0 0 8px; font-size: 19px; font-weight: 760; letter-spacing: -.035em; overflow-wrap: anywhere; }
 .feed-card__description { color: var(--muted); line-height: 1.5; font-size: 13px; }
@@ -216,6 +218,7 @@ button:disabled { cursor: wait; opacity: .64; }
 .article-index { color: #ef91c8; letter-spacing: .1em; font-size: 10px; font-weight: 850; }
 .article-card__title { margin: 0 0 13px; font-size: clamp(18px, 2.2vw, 23px); font-weight: 750; line-height: 1.35; letter-spacing: -.033em; }
 .article-card__title a { text-decoration: none; }
+.article-card__title a:visited { color: #8d303b; }
 .article-card__title a .icon { display: inline; vertical-align: middle; margin-left: 9px; color: #7d7b8f; transition: color .15s; }
 .article-card__title a:hover, .article-card__title a:hover .icon { color: #ffa1cb; }
 .article-card__summary { margin: 0; color: #b5b2c2; font-size: 14px; line-height: 1.75; overflow-wrap: anywhere; }

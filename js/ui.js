@@ -8,18 +8,22 @@ export function esc(value) {
 const tones = new Set(['rose', 'orange', 'purple', 'blue', 'forest', 'plum', 'red', 'gold', 'cyan']);
 function tone(feed) { return tones.has(feed.tone) ? feed.tone : 'cyan'; }
 
-export function feedCard(feed, favorite) {
+export function feedCard(feed, favorite, { muteNonAtom = false } = {}) {
   const favTitle = favorite ? `${feed.name} aus Favoriten entfernen` : `${feed.name} zu Favoriten hinzufügen`;
   const format = feed.format || feedFormat({ url: feed.url });
   const address = feed.discovered ? (() => {
     try { const u = new URL(feed.url); return `${u.host}${u.pathname}${u.search}`; }
     catch { return feed.url; }
   })() : '';
+  const mutedBadge = muteNonAtom && format && !/^Atom(?:\s|$)/i.test(format);
+  const feedIcon = /^data:image\/(?:png|gif|jpeg|x-icon|webp|avif|svg\+xml);base64,[a-z0-9+/=]+$/i.test(feed.favicon || '')
+    ? `<img class="feed-card__favicon" src="${esc(feed.favicon)}" alt="" loading="lazy">`
+    : icon(feed.icon, 23);
   return `<article class="feed-card tone-${tone(feed)}">
     <button class="feed-card__open" type="button" data-action="open-feed" data-url="${esc(feed.url)}" aria-label="${esc(feed.name)} – Nachrichten anzeigen">
-      <span class="feed-card__icon">${icon(feed.icon, 23)}</span>
+      <span class="feed-card__icon">${feedIcon}</span>
       <span class="feed-card__body">
-        <span class="feed-card__label-row"><span class="feed-card__category">${esc(feed.category)}</span>${format ? `<span class="feed-card__format">${esc(format)}</span>` : ''}</span>
+        <span class="feed-card__label-row"><span class="feed-card__category">${esc(feed.category)}</span>${format ? `<span class="feed-card__format ${mutedBadge ? 'is-muted' : ''}">${esc(format)}</span>` : ''}</span>
         <strong class="feed-card__name">${esc(feed.name)}</strong>
         <span class="feed-card__description">${esc(feed.description)}</span>
         ${address ? `<span class="feed-card__url" title="${esc(feed.url)}">${esc(address)}</span>` : ''}
@@ -45,7 +49,11 @@ export function renderFavorites(favorites) {
 
 export function renderDiscover({ catalog, favorites, searchInput, searching, searchError, searchResults }) {
   const favoritesUrls = new Set(favorites.map(feed => feed.url));
-  const found = searchResults.map(url => catalog.find(feed => feed.url === url)).filter(Boolean);
+  const found = searchResults.map(url => {
+    const feed = catalog.find(item => item.url === url);
+    const saved = favorites.find(item => item.url === url);
+    return feed && saved ? { ...feed, favicon: saved.favicon || feed.favicon } : feed;
+  }).filter(Boolean);
   const popular = catalog.filter(feed => !feed.discovered);
   return `<div class="add-panel">
       <div class="add-panel__heading"><span class="add-icon">${icon('plus', 21)}</span><div><h2>Website oder Feed hinzufügen</h2><p>Website durchsuchen oder RSS-/Atom-URL direkt abonnieren.</p></div></div>
@@ -57,7 +65,7 @@ export function renderDiscover({ catalog, favorites, searchInput, searching, sea
       ${searchError ? `<p class="form-error" role="alert">${icon('alert', 15)} ${esc(searchError)}</p>` : ''}
       <a class="attribution" href="https://feedsearch.dev/" target="_blank" rel="noopener noreferrer">powered by Feedsearch</a>
     </div>
-    ${found.length ? `<div class="subsection-heading"><h2>Gefundene Feeds</h2><span class="count-pill">${found.length}</span></div><div class="feed-grid">${found.map(feed => feedCard(feed, favoritesUrls.has(feed.url))).join('')}</div>` : ''}
+    ${found.length ? `<div class="subsection-heading"><h2>Gefundene Feeds</h2><span class="count-pill">${found.length}</span></div><div class="feed-grid">${found.map(feed => feedCard(feed, favoritesUrls.has(feed.url), { muteNonAtom: true })).join('')}</div>` : ''}
     <div class="feed-grid" aria-label="Beliebte Feeds">${popular.map(feed => feedCard(feed, favoritesUrls.has(feed.url))).join('')}</div>`;
 }
 

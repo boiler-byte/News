@@ -43,3 +43,50 @@ Name der App: "News".
 - indexeddb
 
 Gib mir das Ergebnis als v1.
+
+## Bereichstitel
+- Die Überschrift aus section-heading in den mittleren Kasten im Hero-Bild verschieben.
+
+## Feed Ansicht
+- Den Link "Weiterlesen" aus der Kachel entfernen.
+
+## Website URL
+- golem.de hat eine ziemlich große Liste an Feeds, die zum großen Teil alle identisch aussehen. Es sollte noch die Info über den Feed-Typ mit rein (rss,atom,...).
+
+Gib mir die geänderten Dateien als v2.
+
+
+## Hero-Section
+
+- Platziere auch die restlichen section-heading Infos im Schaukasten.
+    - Feed Ansicht:
+        - "tagesschau" (ist gut platziert)
+        - "Nachrichten" (Untertitel)
+        - "40 Artikel" (direkt auf dem Zeitungsstapel platzieren und größer darstellen)
+        - Rechtsunten im Schaukasten:
+            - Die wichtigsten Meldungen aus Deutschland und der Welt. (Beschreibung)
+            - Stand 06. Nov. 2026, 19:02
+    - Erkunden:
+        - "Neue Quellen Entdecken" (Untertitel)
+        - "Beliebte Feeds" (rechtsunten im Schaukasten platzieren)
+        - Die Anzahl der beliebten Feeds größer und direkt auf dem Zeitungsstapel platzieren).
+    - Favoriten:
+        - "Deine Quellen" (Untertitel)
+        - "3 Feeds" (Auf dem Zeitungsstapel platzieren)
+- Die Buttons in der Hero-Section sollen das Bild beim Klick nicht scrollen.
+
+Gib mir die geänderten Dateien als v3.
+
+## Feeds
+- Beim Hinzufügen gefundener Feeds das Fav-Icon der Seite, wenn vorhanden, in indexeddb speichern, als Feed-Symbol verwenden.
+
+## Feed Detail Ansicht
+- Besuchte Links dunkelrot färben.
+
+## Erkunden
+- Bei gefundene Newsfeeds, das Format-Badge ausgrauen, wenn es nicht "Atom" ist.
+
+## PWA
+- Mach die App zu einer PWA.
+
+Gib mir nur die neuen und geänderten Dateien als v4.

@@ -1,57 +1,34 @@
-# News · v3
+# News · v4
 
-Eine kleine RSS-/Atom-Leseapp in **HTML, CSS und Vanilla JavaScript**. Keine Bibliotheken, kein Build-Schritt, keine Anmeldung.
+Kleine RSS-/Atom-Leseapp mit Vanilla JavaScript, ohne Build-Schritt und ohne Anmeldung.
 
-## Starten
+## Starten / installieren
 
-1. Den Ordner `news-v3` entpacken.
-2. Im Ordner einen lokalen Webserver starten, zum Beispiel:
-   ```bash
-   python3 -m http.server 8000
-   ```
-3. `http://localhost:8000` im Browser öffnen. Alternativ den Ordner auf einen statischen Webhost wie GitHub Pages legen.
+1. Die **neuen und geänderten Dateien aus dem v4-ZIP** über die bestehende App (v3) kopieren. Nicht enthaltene Dateien – insbesondere `assets/newsstand.webp` und unveränderte JavaScript-Module – bleiben erhalten.
+2. Die App über **HTTPS** oder einen lokalen Webserver starten, z. B. `python3 -m http.server 8000` und `http://localhost:8000` aufrufen. `file://` unterstützt keinen Service Worker.
+3. Der Browser kann die App über sein Menü **Installieren** bzw. **Zum Startbildschirm** anbieten. Manifest und App-Icons sind lokal enthalten.
 
-> Ein Webserver ist nötig, weil Browser ES-Module beim direkten Öffnen einer `file://`-Datei oft blockieren.
+## Neu in v4
 
-## Bedienung
+- Beim Abonnieren eines über **Erkunden** gefundenen Feeds sucht die App nach dem Website-Favicon (über die HTML-Icon-Links, sonst `/favicon.ico`). Unterstützte Rasterbilder sowie bereinigte SVG-Icons werden als Data-URL **im Favoriteneintrag in IndexedDB gespeichert** und als Feed-Symbol angezeigt. Schlägt die Icon-Suche fehl, bleibt das bisherige Symbol erhalten. Auch direkt hinzugefügte Feed-Adressen werden berücksichtigt.
+- In **Feed-Details** erscheinen bereits besuchte Artikel-Links dunkelrot. Dies basiert auf der `:visited`-Erkennung des Browsers.
+- In **Erkunden** werden bei den gefundenen Feeds die Format-Badges ausgegraut, sofern das Format **nicht Atom** ist (einschließlich Atom-Versionsangaben).
+- Die App ist eine **PWA**: `manifest.webmanifest`, eigene 192/512-Pixel-Icons und `service-worker.js`. Die Benutzeroberfläche ist nach erfolgreicher Installation des Service Workers offline verfügbar. Gespeicherte Artikel und Favoriten bleiben über IndexedDB lesbar. **Neue Feed-Abfragen und Feed-Suche benötigen weiterhin Internet**, da die Quellen extern liegen.
 
-- Auf dem Nachrichtenstand **Favoriten** oder **Erkunden** wählen. Der mittlere Schaukasten zeigt Titel und Untertitel, die Artikel- bzw. Feed-Anzahl direkt über dem Zeitungsstapel sowie rechts unten zusätzliche Informationen (z. B. Feed-Beschreibung und letztes Aktualisierungsdatum). Die Hero-Navigation scrollt beim Wechsel nicht automatisch.
-- In **Favoriten** einen Feed anklicken, um dessen Artikel zu öffnen.
-- Das Herz entfernt den Feed aus den Favoriten oder fügt ihn hinzu.
-- In **Erkunden** eine Website-Adresse eingeben, um mit **Feedsearch** verfügbare Feeds zu finden, und dann das Herz anklicken. Gefundene Feeds zeigen **Format und Version** (z. B. RSS 2.0, Atom 1.0, JSON Feed) und zur Unterscheidung die konkrete Feed-Adresse.
-- Bei einer **direkten Feed-Adresse** (`.rss`, `.xml`, `/feed/`, etc.) wird diese sofort als Favorit angelegt.
-- **Artikelüberschriften** öffnen die Originalseite in einem neuen Tab. Ein zusätzlicher „Weiterlesen“-Link wird nicht mehr angezeigt.
-- Längere Anreißer können auf- und zugeklappt werden.
-- Bei späteren Aufrufen stehen zuletzt geladene Artikel aus dem lokalen Cache bereit.
+## Unveränderte Funktionen
 
-Beim ersten Besuch werden **heise online** und **tagesschau** als Beispielfavoriten angelegt. Danach speichert **IndexedDB** die selbst gewählten Favoriten und den letzten Artikelstand pro Feed. Entfernte Favoriten werden beim nächsten Besuch nicht automatisch neu angelegt. Feedsearch-Funde erweitern den Katalog nur während der aktuellen Sitzung; abonnierte Funde bleiben als Favoriten gespeichert.
+- Favoritenverwaltung, Feed-Suche via Feedsearch mit HTML-Fallback, direkte Feed-URLs, RSS/Atom/JSON Feed, Artikel-Cache in IndexedDB.
+- Das Nachrichtenstand-Motiv und die bestehenden acht Katalogfeeds bleiben erhalten.
+- RSS-Feeds werden zuerst direkt geladen; bei CORS-Problemen wird `https://proxy.cors.dev/` versucht. Der externe Proxy kann die abgerufene URL sehen.
 
-## Technische Hinweise
-
-- Die **Feedsearch-API** unter `https://origin.feedsearch.dev/api/v1/search` wird zur Website-Suche verwendet. Das Feld `version` liefert den Formattyp; bei fehlender Angabe wird er aus der URL oder dem Medien-Typ abgeleitet, falls möglich. Ist sie nicht erreichbar, versucht die App die RSS-/Atom-Links im HTML der Website zu finden.
-- RSS-Feeds lassen sich im Browser oft nicht direkt laden, weil der Anbieter **CORS** nicht freigibt. Die App probiert zuerst einen direkten Abruf, danach den öffentlichen Proxy `https://proxy.cors.dev/`.
-- Ein öffentlich betriebener Proxy ist ein **externer Dienst**. Er sieht die URL, die die App abruft. Dieser Ansatz ist für den einfachen Prototyp gedacht; für Produktivbetrieb ist ein eigener Feed-Proxy empfehlenswert.
-- **Feedsearch** ist ebenfalls ein externer Dienst und kann ausfallen oder Anfragen ablehnen. Nicht jede Website veröffentlicht einen Feed.
-- Unterstützt **RSS 2.0, Atom, RSS/RDF und JSON Feed**. Artikel werden als reiner Text dargestellt, um unsicheres Feed-HTML nicht in die Seite einzufügen.
-- Die acht Katalogeinträge liegen statisch in `js/catalog.js`.
-
-## Struktur
+## Neue Dateien
 
 ```text
-news-v3/
-├── index.html
-├── assets/newsstand.png       # bereitgestelltes Hero-Bild
-├── css/styles.css             # dunkles, responsives Layout
-├── js/app.js                  # Navigation, Events und App-Zustand
-├── js/catalog.js              # statischer Feed-Katalog
-├── js/storage.js              # IndexedDB für Favoriten und Artikelcache
-├── js/feed-reader.js          # RSS-, Atom- und JSON-Feed-Abruf
-├── js/feedsearch.js           # Feedsearch-API + HTML-Fallback
-├── js/feed-format.js          # Format- und Versions-Erkennung
-├── js/icons.js                # lokale SVG-Icons
-└── js/ui.js                   # HTML-Ansichten
+assets/icon-192.png
+assets/icon-512.png
+js/favicon.js
+manifest.webmanifest
+service-worker.js
 ```
 
-## Alternative: Einzelne HTML-Datei
-
-Zusätzlich liegt `news-v3.html` als eigenständige Ein-Datei-Version zum schnellen Ausprobieren vor. Sie enthält dieselben Module gebündelt sowie das Hero-Bild eingebettet. Wenn diese Datei über `file://` geöffnet wird, kann der Browser IndexedDB einschränken. Für dauerhaft gespeicherte Favoriten ist die modulare Variante über einen lokalen Server oder HTTPS die verlässlichere Wahl.
+Weitere enthaltene Dateien des v4-Differenzpakets ersetzen die gleichnamigen v3-Dateien. Der Datenbankname bleibt unverändert, bestehende Favoriten werden nicht zurückgesetzt.

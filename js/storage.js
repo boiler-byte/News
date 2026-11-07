@@ -85,6 +85,7 @@ export async function initializeFavorites(catalog, initialIds) {
 
 export const listFavorites = () => getAll('favorites');
 export const addFavorite = feed => put('favorites', { ...feed, addedAt: Date.now() });
+export const updateFavorite = feed => put('favorites', feed);
 export const deleteFavorite = url => remove('favorites', url);
 export const readCachedFeed = url => get('articles', url);
 export const cacheFeed = (url, articles) => put('articles', { url, articles, fetchedAt: Date.now() });
